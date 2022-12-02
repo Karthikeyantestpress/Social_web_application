@@ -1,10 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from account.views import user_login
+from account.views import dashboard
 
 
 class UserLogin(TestCase):
-    def test_user_login_url(self):
+    def test_user_dashboard_url(self):
 
-        user_login_url = reverse("account:login")
-        self.assertEqual((resolve(user_login_url).func), user_login)
+        user_dashboard_url = reverse("dashboard")
+        self.assertEqual((resolve(user_dashboard_url).func), dashboard)
