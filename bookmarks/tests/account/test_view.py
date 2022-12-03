@@ -10,3 +10,9 @@ class UserLoginView(ModelMixinTestcases, TestCase):
         response = self.client.get(reverse("dashboard"))
 
         self.assertTemplateUsed(response, "account/dashboard.html")
+
+    def test_template_used_with_settings(self):
+
+        response = self.client.get(reverse("settings"))
+
+        self.assertTemplateUsed(response, "account/settings.html")
