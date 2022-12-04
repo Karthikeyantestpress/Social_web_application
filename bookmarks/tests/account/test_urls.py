@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from account.views import dashboard, settings
+from account.views import dashboard, settings, register
 
 
 class UserLogin(TestCase):
@@ -13,3 +13,8 @@ class UserLogin(TestCase):
 
         settings_url = reverse("settings")
         self.assertEqual((resolve(settings_url).func), settings)
+
+    def test_register_url(self):
+
+        register_url = reverse("register")
+        self.assertEqual((resolve(register_url).func), register)
