@@ -17,3 +17,4 @@ django-extensions==3.2.1
 social-auth-app-django==5.0.0
 werkzeug==2.2.2
 pyOpenSSL==22.1.0
+easy-thumbnails==2.8.3
