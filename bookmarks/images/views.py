@@ -6,7 +6,9 @@ from django.shortcuts import get_object_or_404
 from .models import Image
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from common.decorators import ajax_required
+from common.decorators import ajax_required, is_ajax
+from django.http.response import HttpResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 @login_required
@@ -26,6 +28,32 @@ def image_create(request):
         request,
         "images/image/create.html",
         {"section": "images", "form": form},
+    )
+
+
+@login_required
+def image_list(request):
+    images = Image.objects.all()
+    paginator = Paginator(images, 8)
+    page = request.GET.get("page")
+    try:
+        images = paginator.page(page)
+    except PageNotAnInteger:
+        images = paginator.page(1)
+    except EmptyPage:
+        if is_ajax(request):
+            return HttpResponse("")
+        images = paginator.page(paginator.num_pages)
+    if is_ajax(request):
+        return render(
+            request,
+            "images/image/list_ajax.html",
+            {"section": "images", "images": images},
+        )
+    return render(
+        request,
+        "images/image/list.html",
+        {"section": "images", "images": images},
     )
 
 
