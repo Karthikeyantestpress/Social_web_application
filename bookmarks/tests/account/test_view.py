@@ -74,3 +74,21 @@ class UserListView(ModelMixinTestcases, TestCase):
         response = self.client.get(reverse("user_list"))
 
         self.assertTemplateUsed(response, "account/user/list.html")
+
+
+class UserDetailView(ModelMixinTestcases, TestCase):
+    def test_template_used_with_user_detail_view(self):
+
+        self.client.login(username="john", password="johnpassword")
+        response = self.client.get(reverse("user_detail", args=["john"]))
+
+        self.assertTemplateUsed(response, "account/user/detail.html")
+
+    def test_status_code_returns_404_for_invalid_user(self):
+
+        self.client.login(username="john", password="johnpassword")
+        response = self.client.get(
+            reverse("user_detail", args=["invalid-user"])
+        )
+
+        self.assertEqual(response.status_code, 404)
