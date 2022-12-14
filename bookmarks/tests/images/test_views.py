@@ -61,7 +61,7 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_image_like_succeeds_with_valid_image(self):
+    def test_image_like_succeds_when_called_with_ajax(self):
         self.client.login(username="john", password="johnpassword")
 
         self.image = Image.objects.create(
@@ -73,11 +73,11 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
         response = self.client.post(
             reverse("images:like"),
             {"id": 1, "action": "like"},
+            **{"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"}
         )
-
         self.assertEqual(response.content.decode(), '{"status": "ok"}')
 
-    def test_image_unlike_succeeds_with_valid_image(self):
+    def test_image_unlike_succeeds_when_called_with_ajax(self):
         self.client.login(username="john", password="johnpassword")
 
         self.image = Image.objects.create(
@@ -90,16 +90,20 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
         self.client.post(
             reverse("images:like"),
             {"id": 1, "action": "like"},
+            **{"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"}
         )
 
         response = self.client.post(
             reverse("images:like"),
             {"id": 1, "action": "unlike"},
+            **{"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"}
         )
 
         self.assertEqual(response.content.decode(), '{"status": "ok"}')
 
-    def test_image_like_fails_without_image_id_and_action(self):
+    def test_image_like_fails_without_image_id_and_action_when_called_with_ajax(
+        self,
+    ):
         self.client.login(username="john", password="johnpassword")
 
         self.image = Image.objects.create(
@@ -109,13 +113,15 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
             image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
         )
         response = self.client.post(
-            reverse("images:like"), {"id": "None", "action": "None"}
+            reverse("images:like"),
+            {"id": "None", "action": "None"},
+            **{"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"}
         )
         self.assertEqual(response.content.decode(), '{"status": "error"}')
 
-    def test_image_like_directly_called_returns_status_code_200(self):
+    def test_image_like_directly_called_returns_status_code_400(self):
         self.client.login(username="john", password="johnpassword")
         response = self.client.post(
             reverse("images:like"),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
