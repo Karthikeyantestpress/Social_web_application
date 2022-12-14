@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm, ProfileEditForm, UserEditForm
 from django.contrib import messages
 from .models import Profile
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 
 @login_required
@@ -65,4 +67,14 @@ def edit(request):
         request,
         "account/edit.html",
         {"user_form": user_form, "profile_form": profile_form},
+    )
+
+
+@login_required
+def user_list(request):
+    users = User.objects.filter(is_active=True)
+    return render(
+        request,
+        "account/user/list.html",
+        {"section": "people", "users": users},
     )
