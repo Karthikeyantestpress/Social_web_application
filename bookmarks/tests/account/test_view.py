@@ -65,3 +65,12 @@ class UserLoginView(ModelMixinTestcases, TestCase):
         user = User.objects.get(id=1)
         username = user.first_name
         self.assertEqual(username, "johncena")
+
+
+class UserListView(ModelMixinTestcases, TestCase):
+    def test_template_used_with_user_list_view(self):
+
+        self.client.login(username="john", password="johnpassword")
+        response = self.client.get(reverse("user_list"))
+
+        self.assertTemplateUsed(response, "account/user/list.html")
