@@ -9,6 +9,13 @@ from django.views.decorators.http import require_POST
 from common.decorators import ajax_required, is_ajax
 from django.views.generic import ListView
 from actions.utils import create_action
+import redis
+from django.conf import settings
+
+
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
+)
 
 
 @login_required
@@ -34,7 +41,7 @@ def image_create(request):
 
 class ImageListView(ListView):
     model = Image
-    queryset=Image.objects.order_by("-total_likes")
+    queryset = Image.objects.order_by("-total_likes")
     paginate_by = 6
     context_object_name = "images"
 
@@ -47,10 +54,11 @@ class ImageListView(ListView):
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
+    total_views = redis_client.incr(f"image:{image.id}:views")
     return render(
         request,
         "images/image/detail.html",
-        {"section": "images", "image": image},
+        {"section": "images", "image": image, "total_views": total_views},
     )
 
 
