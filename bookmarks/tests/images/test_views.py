@@ -133,3 +133,42 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
         self.assertTemplateUsed(
             response, "images/image/list.html", "images/image/list_ajax.html"
         )
+<<<<<<< HEAD
+=======
+
+    def test_images_list_returns_first_page_as_default(self):
+        self.client.login(username="john", password="johnpassword")
+        response = self.client.get(
+            reverse("images:list"),
+            {"images": self.create_images(30)},
+        )
+        self.assertEqual(response.context.get("images").number, 1)
+
+
+class ImagesDisplayView(ModelMixinTestcases, TestCase):
+    def test_images_diaplay(self):
+        self.client.login(username="john", password="johnpassword")
+        Zero_like_image = Image.objects.create(
+            user=self.user,
+            title="first-image",
+            slug="first-image",
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
+        )
+
+        one_like_image = Image.objects.create(
+            user=self.user,
+            title="second-image",
+            slug="second-image",
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
+        )
+        self.client.post(
+            reverse("images:like"),
+            {"id": 2, "action": "like"},
+            **{"HTTP_X_REQUESTED_WITH": "XMLHttpRequest"}
+        )
+        Image_list_view = self.client.get(reverse("images:list"))
+        self.assertQuerysetEqual(
+            Image_list_view.context.get("images"),
+            [one_like_image, Zero_like_image],
+        )
+>>>>>>> 559fc5d... Display image by popularity
