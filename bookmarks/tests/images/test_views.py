@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from images.models import Image
 from tests.account.test_model_mixin_testcases import ModelMixinTestcases
-from PIL import Image as img
 
 
 class ImageCreateView(ModelMixinTestcases, TestCase):
@@ -61,3 +60,62 @@ class ImageCreateView(ModelMixinTestcases, TestCase):
             reverse("images:detail", args=[1, "test-image"])
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_image_like_succeeds_with_valid_image(self):
+        self.client.login(username="john", password="johnpassword")
+
+        self.image = Image.objects.create(
+            user=self.user,
+            title="test",
+            slug="test",
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
+        )
+        response = self.client.post(
+            reverse("images:like"),
+            {"id": 1, "action": "like"},
+        )
+
+        self.assertEqual(response.content.decode(), '{"status": "ok"}')
+
+    def test_image_unlike_succeeds_with_valid_image(self):
+        self.client.login(username="john", password="johnpassword")
+
+        self.image = Image.objects.create(
+            user=self.user,
+            title="tests",
+            slug="tests",
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
+        )
+
+        self.client.post(
+            reverse("images:like"),
+            {"id": 1, "action": "like"},
+        )
+
+        response = self.client.post(
+            reverse("images:like"),
+            {"id": 1, "action": "unlike"},
+        )
+
+        self.assertEqual(response.content.decode(), '{"status": "ok"}')
+
+    def test_image_like_fails_without_image_id_and_action(self):
+        self.client.login(username="john", password="johnpassword")
+
+        self.image = Image.objects.create(
+            user=self.user,
+            title="test",
+            slug="test",
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Opera_UdL_asv2018-05.jpg/800px-Berlin_Opera_UdL_asv2018-05.jpg",
+        )
+        response = self.client.post(
+            reverse("images:like"), {"id": "None", "action": "None"}
+        )
+        self.assertEqual(response.content.decode(), '{"status": "error"}')
+
+    def test_image_like_directly_called_returns_status_code_200(self):
+        self.client.login(username="john", password="johnpassword")
+        response = self.client.post(
+            reverse("images:like"),
+        )
+        self.assertEqual(response.status_code, 200)
