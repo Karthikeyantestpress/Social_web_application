@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from images.views import image_create, image_detail, image_like
+from images.views import image_create, image_detail, image_like, ImageListView
 
 
 class ImageUrls(TestCase):
@@ -19,4 +19,10 @@ class ImageUrls(TestCase):
         self.assertEqual(
             (resolve(reverse("images:like")).func),
             image_like,
+        )
+
+    def test_image_list_url(self):
+        self.assertEqual(
+            (resolve(reverse("images:list")).func.view_class),
+            ImageListView,
         )
