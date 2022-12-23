@@ -1,6 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from account.views import dashboard, settings, register, edit, user_list
+from account.views import (
+    dashboard,
+    settings,
+    register,
+    edit,
+    user_list,
+    user_detail,
+)
 
 
 class UserLogin(TestCase):
@@ -28,3 +35,8 @@ class UserLogin(TestCase):
 
         user_list_url = reverse("user_list")
         self.assertEqual((resolve(user_list_url).func), user_list)
+
+    def test_user_detail_url(self):
+
+        user_detail_url = reverse("user_detail", args=["john"])
+        self.assertEqual((resolve(user_detail_url).func), user_detail)
