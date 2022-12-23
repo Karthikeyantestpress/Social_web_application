@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django.contrib import messages
 from django.views.generic.edit import FormView
+from .models import Profile
 
 
 @login_required
@@ -24,6 +25,7 @@ class UserRegistrationForm(FormView):
         new_user = form.save(commit=False)
         new_user.set_password(form.cleaned_data["password"])
         new_user.save()
+        Profile.objects.create(user=new_user)
         messages.success(
             self.request,
             "Registration successful you can login now to your account.",
